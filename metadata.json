@@ -1,0 +1,6 @@
+{
+  "name": "BBS Segurança",
+  "description": "Sistema de Segurança Baseada em Comportamento com avaliação de riscos por voz e relatórios automatizados",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
