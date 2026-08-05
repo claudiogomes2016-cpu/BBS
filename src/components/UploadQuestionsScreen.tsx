@@ -55,7 +55,7 @@ export const UploadQuestionsScreen: React.FC<UploadQuestionsScreenProps> = ({
     setStatusMessage('Lendo arquivo de perguntas...');
 
     try {
-      const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || (process as any).env?.GEMINI_API_KEY || '';
+      const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
 
       if (file.type.startsWith('image/') && apiKey) {
         // Image OCR with Gemini AI

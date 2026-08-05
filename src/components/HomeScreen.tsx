@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mic, Upload, Clock, ChevronRight, Headphones, Glasses, Ear, ShieldCheck } from 'lucide-react';
+import { Mic, Upload, Clock, ChevronRight, Headphones, Glasses, Ear, ShieldCheck, Pencil, Trash2 } from 'lucide-react';
 import { BBSObservation, BBSQuestion } from '../types';
 
 interface HomeScreenProps {
@@ -9,6 +9,8 @@ interface HomeScreenProps {
   onOpenUploadQuestions: () => void;
   onOpenHistory: () => void;
   onSelectObservation: (obs: BBSObservation) => void;
+  onEditObservation: (obs: BBSObservation) => void;
+  onDeleteObservation: (id: string) => void;
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
@@ -18,6 +20,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onOpenUploadQuestions,
   onOpenHistory,
   onSelectObservation,
+  onEditObservation,
+  onDeleteObservation,
 }) => {
   const activeQuestionsCount = questions.filter(q => q.active).length;
   const currentMonthYear = '2026-08';
@@ -181,10 +185,32 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                       </div>
                     </div>
 
-                    <div className="text-right">
+                    <div className="flex items-center gap-2.5 flex-shrink-0">
                       <span className="font-mono font-bold text-xs uppercase tracking-wider text-black">
                         {obs.status}
                       </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEditObservation(obs);
+                        }}
+                        aria-label="Editar"
+                        className="p-1.5 text-black border border-black hover:bg-gray-100"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm(`Deseja excluir o registro de ${obs.collaborator}?`)) {
+                            onDeleteObservation(obs.id);
+                          }
+                        }}
+                        aria-label="Excluir"
+                        className="p-1.5 text-red-600 border border-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </div>
                 );

@@ -7,6 +7,7 @@ import { InterviewScreen } from './components/InterviewScreen';
 import { ReportScreen } from './components/ReportScreen';
 import { UploadQuestionsScreen } from './components/UploadQuestionsScreen';
 import { HistoryScreen } from './components/HistoryScreen';
+import { EditObservationScreen } from './components/EditObservationScreen';
 import { analyzeBBSObservation } from './services/geminiService';
 
 export const App: React.FC = () => {
@@ -35,6 +36,7 @@ export const App: React.FC = () => {
   const [tempCollaborator, setTempCollaborator] = useState('');
   const [tempArea, setTempArea] = useState('');
   const [selectedObservation, setSelectedObservation] = useState<BBSObservation | null>(null);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   // Sync state to LocalStorage
   useEffect(() => {
@@ -109,6 +111,51 @@ export const App: React.FC = () => {
     setActiveScreen('REPORT');
   };
 
+  const handleDeleteObservation = (id: string) => {
+    setObservations(prev => prev.filter(o => o.id !== id));
+  };
+
+  const handleEditObservation = (obs: BBSObservation) => {
+    setSelectedObservation(obs);
+    setActiveScreen('EDIT_OBSERVATION');
+  };
+
+  // Edited answers -> re-run AI analysis and update the existing observation
+  const handleSaveEdit = async (
+    collaborator: string,
+    area: string,
+    answers: QuestionAnswer[]
+  ) => {
+    if (!selectedObservation) return;
+
+    setIsSavingEdit(true);
+    const qaList = answers.map(a => ({
+      questionNumber: a.questionNumber,
+      questionTitle: a.questionTitle,
+      answer: a.transcribedText,
+    }));
+
+    const analysis = await analyzeBBSObservation(collaborator, area, qaList);
+
+    const updatedObservation: BBSObservation = {
+      ...selectedObservation,
+      collaborator,
+      area,
+      answers,
+      status: analysis.status,
+      identifiedRisks: analysis.identifiedRisks,
+      positivePoints: analysis.positivePoints,
+      actionPlanNeeded: analysis.actionPlanNeeded,
+      actionPlanText: analysis.actionPlanText,
+      leaderRecommendations: analysis.leaderRecommendations,
+    };
+
+    setObservations(prev => prev.map(o => o.id === updatedObservation.id ? updatedObservation : o));
+    setSelectedObservation(updatedObservation);
+    setIsSavingEdit(false);
+    setActiveScreen('REPORT');
+  };
+
   return (
     <div className="w-full min-h-screen bg-[#F8F9FA] text-black">
       {activeScreen === 'HOME' && (
@@ -119,6 +166,8 @@ export const App: React.FC = () => {
           onOpenUploadQuestions={() => setActiveScreen('UPLOAD_QUESTIONS')}
           onOpenHistory={() => setActiveScreen('HISTORY')}
           onSelectObservation={handleSelectObservation}
+          onEditObservation={handleEditObservation}
+          onDeleteObservation={handleDeleteObservation}
         />
       )}
 
@@ -160,6 +209,17 @@ export const App: React.FC = () => {
           observations={observations}
           onBack={() => setActiveScreen('HOME')}
           onSelectObservation={handleSelectObservation}
+          onEditObservation={handleEditObservation}
+          onDeleteObservation={handleDeleteObservation}
+        />
+      )}
+
+      {activeScreen === 'EDIT_OBSERVATION' && selectedObservation && (
+        <EditObservationScreen
+          observation={selectedObservation}
+          onBack={() => setActiveScreen('HISTORY')}
+          onSave={handleSaveEdit}
+          isSaving={isSavingEdit}
         />
       )}
     </div>

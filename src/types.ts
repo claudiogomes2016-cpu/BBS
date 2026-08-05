@@ -32,10 +32,11 @@ export interface BBSObservation {
   leaderRecommendations: string[];
 }
 
-export type ActiveScreen = 
-  | 'HOME' 
-  | 'NEW_OBSERVATION' 
-  | 'INTERVIEW' 
-  | 'REPORT' 
-  | 'UPLOAD_QUESTIONS' 
-  | 'HISTORY';
+export type ActiveScreen =
+  | 'HOME'
+  | 'NEW_OBSERVATION'
+  | 'INTERVIEW'
+  | 'REPORT'
+  | 'UPLOAD_QUESTIONS'
+  | 'HISTORY'
+  | 'EDIT_OBSERVATION';
