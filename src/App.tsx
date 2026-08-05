@@ -166,6 +166,8 @@ export const App: React.FC = () => {
           onOpenUploadQuestions={() => setActiveScreen('UPLOAD_QUESTIONS')}
           onOpenHistory={() => setActiveScreen('HISTORY')}
           onSelectObservation={handleSelectObservation}
+          onEditObservation={handleEditObservation}
+          onDeleteObservation={handleDeleteObservation}
         />
       )}
 
