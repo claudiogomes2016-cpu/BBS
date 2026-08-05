@@ -15,7 +15,7 @@ export async function analyzeBBSObservation(
   area: string,
   qaList: { questionNumber: number; questionTitle: string; answer: string }[]
 ): Promise<AnalysisResult> {
-  const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || (process as any).env?.GEMINI_API_KEY || '';
+  const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
 
   // Check if all answers are empty or '(sem resposta)'
   const hasValidAnswers = qaList.some(
