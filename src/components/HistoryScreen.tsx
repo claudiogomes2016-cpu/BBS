@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 import { HeaderBar } from './HeaderBar';
 import { BBSObservation, SafetyLevel } from '../types';
-import { Search, Filter, Calendar } from 'lucide-react';
+import { Search, Filter, Calendar, Pencil, Trash2 } from 'lucide-react';
 
 interface HistoryScreenProps {
   observations: BBSObservation[];
   onBack: () => void;
   onSelectObservation: (obs: BBSObservation) => void;
+  onEditObservation: (obs: BBSObservation) => void;
+  onDeleteObservation: (id: string) => void;
 }
 
 export const HistoryScreen: React.FC<HistoryScreenProps> = ({
   observations,
   onBack,
   onSelectObservation,
+  onEditObservation,
+  onDeleteObservation,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<SafetyLevel | 'TODOS'>('TODOS');
@@ -98,10 +102,32 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
                   </div>
                 </div>
 
-                <div className="text-right">
+                <div className="flex items-center gap-3 flex-shrink-0">
                   <span className="font-mono font-bold text-xs uppercase tracking-wider text-black">
                     {obs.status}
                   </span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditObservation(obs);
+                    }}
+                    aria-label="Editar"
+                    className="p-1.5 text-black border border-black hover:bg-gray-100"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (confirm(`Deseja excluir o registro de ${obs.collaborator}?`)) {
+                        onDeleteObservation(obs.id);
+                      }
+                    }}
+                    aria-label="Excluir"
+                    className="p-1.5 text-red-600 border border-red-600 hover:bg-red-50"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
             ))
