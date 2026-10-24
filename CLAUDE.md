@@ -10,9 +10,11 @@ Valem para todos os projetos, painéis e relatórios deste usuário.
   título em Montserrat 900 com a 2ª palavra em azul `#5B84FF`, subtítulo, linha
   "PESSOAS | PROCESSOS | RESULTADOS · PLANTA TRÊS RIOS · BR3R", bloco "REFERÊNCIA" com
   a data à direita e logo Ball.
-- **Estático** significa:
-  - tamanho fixo em px (nada de `clamp()`/`vw` que muda com a largura da tela);
-  - `position: static` — não é sticky/fixed, não acompanha a rolagem;
+- **Estático** significa que o banner **fica parado no topo da tela**:
+  - sempre visível ao rolar a página (`position: sticky; top: 0`, com fundo da página
+    atrás para o conteúdo não aparecer por cima);
+  - mesmo layout em qualquer tamanho de janela: tamanho fixo em px, nada de `clamp()`/`vw`,
+    e nenhum item do banner some em telas menores (sem media queries no banner);
   - sem animação.
 - Resto da página no mesmo padrão: fundo claro `#E9EDF3`, cards brancos com faixa
   colorida no topo, ícone em quadrado colorido, números grandes, rótulos em
