@@ -40,6 +40,17 @@ Todo script que extrai planilhas do SAP (MB52, VL10D, ZTSD…, etc.) deve:
 - Fechar o arquivo no Excel **antes** de exportar também (arquivo aberto impede o SAP
   de substituir).
 
+- **Scripts usam a pasta onde estão** (`GetParentFolderName(WScript.ScriptFullName)`),
+  nunca caminho fixo: HTML, `dados.js`, `status.js` e `.vbs` vivem na mesma pasta.
+- Cada projeto tem um **`Instalar_<projeto>.vbs`** (rodado uma vez) que encerra monitores
+  antigos, desativa scripts de pastas antigas, registra os botões do painel (protocolo
+  `HKCU\Software\Classes\<proto>`) e cria atalhos (Área de Trabalho + inicialização).
+  O painel tem os botões **⚙ Instalar** (diagnóstico), **📁 Pasta SAP**, **🔗 Atalhos SAP**
+  e **↻ Atualizar SAP**.
+- O script do SAP grava `status.js` (rodando/ok/erro); o painel mostra amarelo → verde
+  ("Relatório atualizado com sucesso", também falado em voz pt-BR) ou vermelho com a
+  etapa que falhou — nunca `MsgBox` por cima da tela.
+
 ## Detalhes técnicos já resolvidos
 
 - Arquivo "Planilha" do SAP (`.xls` em texto, separado por tabulação) **não** deve ser
