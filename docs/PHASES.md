@@ -44,6 +44,8 @@
   approved commissions are being paid in USD, upgrade to Pro (US$ 25/month) and move
   the project into the main organization (Supabase project transfer, or a new Pro
   project plus migrations and data copy).
+- **Vercel plan:** Hobby (free) is for non-commercial use. Upgrade to Vercel Pro
+  (US$ 20/month) together with Supabase Pro when revenue starts.
 - **Google Ads:** link every ad account under one Manager (MCC) account, which is
   also required for the API developer token. Don't run the same offer/domain from
   several accounts in the same auctions, and never use one account to replace a
