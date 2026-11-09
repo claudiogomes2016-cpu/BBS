@@ -3,8 +3,8 @@
 ## 1. Supabase
 
 1. Create a project (choose a US region, e.g. `us-east-1`, close to Vercel).
-2. Apply the migrations, in order, from `supabase/migrations/`:
-   - SQL editor: paste each file and run, **or**
+2. Apply the database:
+   - **Easiest:** SQL Editor → paste the whole `supabase/setup.sql` → Run (new, empty project), **or**
    - Supabase CLI: `supabase link --project-ref <ref>` then `supabase db push`.
 3. Auth → URL configuration: set **Site URL** to your domain and add
    `https://<domain>/auth/callback` to the redirect URLs.

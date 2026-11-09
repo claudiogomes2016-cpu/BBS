@@ -35,3 +35,17 @@
   Track the next Next.js 15.x patch.
 - UI language is English (international product). Portuguese UI can be added via
   `profiles.preferred_locale`.
+
+## Business reminders
+
+- **Supabase plan:** the project starts on the FREE plan in a separate account
+  (the main account has reached its 2 free projects). Free projects pause after
+  about 1 week of inactivity and have no daily backups. **Trigger:** when the first
+  approved commissions are being paid in USD, upgrade to Pro (US$ 25/month) and move
+  the project into the main organization (Supabase project transfer, or a new Pro
+  project plus migrations and data copy).
+- **Google Ads:** link every ad account under one Manager (MCC) account, which is
+  also required for the API developer token. Don't run the same offer/domain from
+  several accounts in the same auctions, and never use one account to replace a
+  suspended one: Google treats that as circumventing its systems and suspends
+  linked accounts together.
