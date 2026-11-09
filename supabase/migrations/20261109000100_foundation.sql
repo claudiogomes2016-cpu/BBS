@@ -688,3 +688,8 @@ grant all on all sequences in schema public to service_role;
 revoke insert, update, delete on public.audit_log from authenticated;
 revoke execute on function public.handle_new_user() from public, anon, authenticated;
 revoke execute on function public.audit_row() from public, anon, authenticated;
+
+-- Explicit EXECUTE grants: projects created with "auto-expose new tables" OFF
+-- may not grant function execution by default. RLS policies call this helper.
+revoke execute on function public.has_workspace_role(uuid, public.member_role) from public, anon;
+grant execute on function public.has_workspace_role(uuid, public.member_role) to authenticated, service_role;

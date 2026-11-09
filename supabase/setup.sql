@@ -694,6 +694,11 @@ revoke insert, update, delete on public.audit_log from authenticated;
 revoke execute on function public.handle_new_user() from public, anon, authenticated;
 revoke execute on function public.audit_row() from public, anon, authenticated;
 
+-- Explicit EXECUTE grants: projects created with "auto-expose new tables" OFF
+-- may not grant function execution by default. RLS policies call this helper.
+revoke execute on function public.has_workspace_role(uuid, public.member_role) from public, anon;
+grant execute on function public.has_workspace_role(uuid, public.member_role) to authenticated, service_role;
+
 -- >>> 20261109000200_dashboard_functions.sql
 -- =============================================================================
 -- Dashboard read functions. SECURITY INVOKER: they run under the caller's RLS,
