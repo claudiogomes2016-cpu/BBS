@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -16,6 +17,16 @@ const credentials = z.object({
 });
 
 /** Only allow same-site relative redirects (blocks open redirects like //evil.com). */
+/** Public origin of this deployment (works on Vercel without extra config). */
+async function requestOrigin(): Promise<string> {
+  const h = await headers();
+  const origin = h.get("origin");
+  if (origin && /^https?:\/\/[^/]+$/.test(origin)) return origin;
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  if (host) return `${h.get("x-forwarded-proto") ?? "https"}://${host}`;
+  return siteUrl();
+}
+
 function safeNext(v: FormDataEntryValue | null): string {
   const s = typeof v === "string" ? v : "";
   return s.startsWith("/") && !s.startsWith("//") && !s.startsWith("/\\") ? s : "/dashboard";
@@ -44,7 +55,7 @@ export async function signUp(_prev: FormState, formData: FormData): Promise<Form
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
-      emailRedirectTo: `${siteUrl()}/auth/callback`,
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ? siteUrl() : await requestOrigin()}/auth/callback`,
       data: { full_name: parsed.data.fullName ?? "" },
     },
   });
