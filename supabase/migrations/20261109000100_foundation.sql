@@ -4,7 +4,7 @@
 -- All money is stored in USD (numeric) unless a column says otherwise.
 -- =============================================================================
 
-create extension if not exists pgcrypto;
+-- gen_random_uuid() is built into PostgreSQL 13+; no extension required.
 
 -- ---------------------------------------------------------------------------
 -- Enums
@@ -289,7 +289,7 @@ create index daily_metrics_ws_date_idx on public.daily_metrics (workspace_id, me
 create table public.clicks (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces (id) on delete cascade,
-  click_id text not null unique default encode(gen_random_bytes(12), 'hex'),
+  click_id text not null unique default replace(gen_random_uuid()::text, '-', ''),
   gclid text,
   utm_source text,
   utm_medium text,
