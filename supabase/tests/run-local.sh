@@ -20,5 +20,5 @@ for f in "$ROOT"/supabase/migrations/*.sql; do
   "${PSQL[@]}" -f "$f"
 done
 echo "→ running tests"
-"${PSQL[@]}" -f "$HERE/rls_and_ledger_test.sql"
+for t in rls_and_ledger_test.sql clickbank_ingest_test.sql; do "${PSQL[@]}" -f "$HERE/$t"; done
 echo "✔ database tests passed"

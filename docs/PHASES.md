@@ -3,8 +3,8 @@
 | Phase | Scope | Status |
 |---|---|---|
 | 1 | Foundation: architecture, auth, database + RLS, executive dashboard, financial limits, approval center | ✅ Delivered |
-| 2 | ClickBank integration | Next |
-| 3 | Digistore24 integration | Planned |
+| 2 | ClickBank integration (Instant Notifications v8.0, API key check) | ✅ Delivered |
+| 3 | Digistore24 integration | Next |
 | 4 | Product Radar + CPA offer evaluation (score 0–100) | Planned |
 | 5 | Keyword Intelligence + CPC Intelligence | Planned |
 | 6 | Landing Page Builder (mobile-first, compliant) | Planned |
@@ -26,6 +26,24 @@
   Postgres executing real RLS. Covers login, dashboard figures, BRL view, breakdowns,
   approve flow, settings validation and persistence, tenant isolation, mobile menu, and
   no horizontal scroll.
+
+## Phase 2: ClickBank
+
+- **Webhook:** `POST /api/webhooks/clickbank/<token>`, one unguessable URL per workspace
+  (Settings → ClickBank). The payload is AES-256-CBC encrypted with the workspace's secret
+  key (key = first 32 hex chars of SHA-1(secret)). A notification that does not decrypt is
+  rejected with 401.
+- **Event mapping:** SALE/BILL → approved commission (ClickBank credits affiliates at sale
+  time); RFND → refunded; CGBK/INSF → chargeback; TEST* → marks the connection verified,
+  no money; CANCEL-REBILL and other types are logged only. Retries are de-duplicated by
+  `receipt|type|time`. Products are auto-created from the line item.
+- **Secrets:** stored in `integration_secrets`, readable only by the service role, and
+  never written to the audit log. Admins set them through `set_integration_secret()`.
+- **API key:** validated live against `GET /rest/1.3/orders2/count` (`Authorization: <key>`).
+- **Tests:** INS decryption round trip, documented transaction types, idempotency,
+  refunds and chargebacks, unknown token, wrong secret, and tenant/role isolation.
+- **Limitation:** a refund of a *rebill* is matched to the original receipt. Order-level
+  reconciliation through the Orders API comes once a real key confirms the response format.
 
 ## Known follow-ups
 

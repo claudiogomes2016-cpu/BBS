@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { z } from "zod";
+import { headers } from "next/headers";
 import { Badge, Card, PageHeader } from "@/components/ui/primitives";
+import { ClickBankCard } from "@/components/settings/ClickBankCard";
 import { LimitsForm, WorkspaceForm, type LimitsValues } from "@/components/settings/Forms";
 import { requireContext, roleAtLeast } from "@/server/context";
 import { getLatestFx } from "@/server/dashboard";
@@ -38,7 +40,7 @@ export default async function SettingsPage() {
   const ctx = await requireContext();
   const canEdit = roleAtLeast(ctx.role, "admin");
 
-  const [limitsRes, connRes, fx] = await Promise.all([
+  const [limitsRes, connRes, fx, secretsRes] = await Promise.all([
     ctx.supabase
       .from("financial_limits")
       .select(
@@ -48,14 +50,20 @@ export default async function SettingsPage() {
       .single(),
     ctx.supabase
       .from("platform_connections")
-      .select("platform, status, last_sync_at, last_error")
+      .select("platform, status, last_sync_at, last_error, webhook_token, account_nickname, verified_at, last_event_at")
       .eq("workspace_id", ctx.workspace.id)
       .order("platform"),
     getLatestFx(ctx),
+    ctx.supabase.rpc("integration_secret_status", { p_workspace: ctx.workspace.id }),
   ]);
   if (limitsRes.error) throw new Error(`Failed to load limits: ${limitsRes.error.message}`);
   if (connRes.error) throw new Error(`Failed to load connections: ${connRes.error.message}`);
   const limits = limitsSchema.parse(limitsRes.data);
+  const h = await headers();
+  const origin = `${h.get("x-forwarded-proto") ?? "https"}://${h.get("x-forwarded-host") ?? h.get("host")}`;
+  const secrets = (secretsRes.data ?? []) as { platform: string; name: string; hint: string }[];
+  const hint = (name: string) => secrets.find((x) => x.platform === "clickbank" && x.name === name)?.hint ?? null;
+  const cb = (connRes.data ?? []).find((c) => c.platform === "clickbank");
   const { updated_at, ...values } = limits;
 
   return (
@@ -73,9 +81,25 @@ export default async function SettingsPage() {
           <LimitsForm values={values as LimitsValues} canEdit={canEdit} />
         </Card>
 
-        <Card title="Affiliate platforms" subtitle="Credentials are stored server-side only, never in the browser.">
+        {cb && (
+          <Card title="ClickBank" subtitle="Sales, refunds and chargebacks flow in automatically. Secrets are stored server-side only.">
+            <ClickBankCard
+              canEdit={canEdit}
+              webhookUrl={`${origin}/api/webhooks/clickbank/${cb.webhook_token}`}
+              status={String(cb.status)}
+              nickname={cb.account_nickname}
+              verifiedAt={cb.verified_at}
+              lastEventAt={cb.last_event_at}
+              lastError={cb.last_error}
+              insHint={hint("ins_secret_key")}
+              apiHint={hint("api_key")}
+            />
+          </Card>
+        )}
+
+        <Card title="Other platforms" subtitle="Credentials are stored server-side only, never in the browser.">
           <ul className="divide-y divide-line">
-            {(connRes.data ?? []).map((c) => (
+            {(connRes.data ?? []).filter((c) => c.platform !== "clickbank").map((c) => (
               <li key={c.platform} className="flex items-center justify-between gap-3 py-3">
                 <div>
                   <p className="text-sm font-medium text-ink">{PLATFORM_LABEL[c.platform] ?? c.platform}</p>
